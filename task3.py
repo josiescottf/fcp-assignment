@@ -77,7 +77,6 @@ class Network:
 
                     ax.plot((node_x, neighbour_x), (node_y, neighbour_y), color='black')
 
-    # calculate the mean degree of the network
     def get_mean_degree(self):
         '''
         A function that calculates the mean degree of all nodes in a given network
@@ -88,14 +87,13 @@ class Network:
         '''
 
         # Initialising list of degrees of each node
-
         degrees = []
 
         for node in self.nodes:
             # calculate the degree of each node (how many neighbours does the node have)
             neighbours = node.get_neighbours()
             degree = len(neighbours)
-            # store the degree of all nodes in a list
+            # store the degrees of all nodes in a list
             degrees.append(degree)
 
         # calculate mean
@@ -103,8 +101,7 @@ class Network:
 
         return mean_degree
 
-    # calculate the mean path length of the network
-    def get_mean_path_length(self):
+    def get_path_length(self):
         '''
         A function that calculates the mean path length between all nodes in a network
         Inputs:
@@ -112,16 +109,60 @@ class Network:
         Outputs:
             mean_path_length - The average path length between two nodes in a network
         '''
+
+        # Initialising a list to store the average path lengths for each node
+        mean_paths = []
+
         # calculate the mean path length from a node to all other nodes
-        # calculate the path length between 2 nodes
-        # store the mean path length of all nodes in a list
+        for node in self.nodes:
+            # Initialising a list to store the path length from one node to all others
+            path_lengths = np.zeros(len(self.nodes))
+            # Initialising path length covered
+            n = 0
+            
+            # Initalising lists of neighbours to be tested and neighbours that have been tested
+            new_neighbours = node.get_neighbours()
+            tested_neighbours = []
+
+            # Looping through every node found until there are none left
+            while np.any(new_neighbours):
+                n += 1
+
+                # Adding path lengths to the list
+                for i in new_neighbours:
+                    path_lengths[i] = n
+                
+                # Adding to list of nodes that have been tested
+                tested_neighbours = np.append(tested_neighbours, new_neighbours)
+
+                # initialising list to store next degree of neighbours
+                next_new_neighbours = []
+                # finding next degree of neighbours 
+                for i in new_neighbours:
+                    next_new_neighbours.append(self.nodes[i].get_neighbours())
+
+                # removing duplicates from this list
+                next_new_neighbours = np.unique(next_new_neighbours)
+
+                # removing unnecessary nodes from this list
+                for i in tested_neighbours:
+                    next_new_neighbours = np.delete(next_new_neighbours, np.where(next_new_neighbours == i))
+                next_new_neighbours = np.delete(next_new_neighbours, np.where(next_new_neighbours == node))
+                
+                # asserting the new set of neighbours
+                new_neighbours = next_new_neighbours
+
+            # removing 0 values from path length (don't want to record path distance to self)
+            path_lengths = np.delete(path_lengths, np.where(path_lengths == 0))
+            print(path_lengths)
+            mean_paths.append(statistics.mean(path_lengths))
+
         # calculate mean
-        mean_path_length = 0
+        mean_path_length = statistics.mean(mean_paths)
 
         return mean_path_length
 
 
-    # calculate the mean clustering coefficient of the network
     def get_mean_clustering(self):
         '''
         A function that calculates the mean clustering coefficient in a network
@@ -158,7 +199,7 @@ class Network:
         print("Testing ring network")
         assert (network.get_mean_degree() == 2), network.get_mean_degree()
         #assert (network.get_clustering() == 0), network.get_clustering()
-        #assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
+        assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
 
         nodes = []
         num_nodes = 10
@@ -186,7 +227,7 @@ class Network:
         print("Testing fully connected network")
         assert (network.get_mean_degree() == num_nodes - 1), network.get_mean_degree()
         #assert (network.get_clustering() == 1), network.get_clustering()
-        #assert (network.get_path_length() == 1), network.get_path_length()
+        assert (network.get_path_length() == 1), network.get_path_length()
 
         print("All tests passed")
 
@@ -203,12 +244,16 @@ def main():
 
     args = parser.parse_args()
 
+    # creating a network to work with
     network = Network()
 
+    # creating a random network if network flag is given
     if args.network:
         network.make_random_network(int(args.network[0]), args.connection_probability)
+        # finding mean degree of network
         print(network.get_mean_degree())
 
+    # testing functions if test_network flag is given
     if args.test_network:
         network.test_networks()
 
