@@ -109,7 +109,7 @@ class Network:
         Outputs:
             mean_path_length - The average path length between two nodes in a network
         '''
-
+        
         # Initialising a list to store the average path lengths for each node
         mean_paths = []
 
@@ -122,10 +122,10 @@ class Network:
             
             # Initalising lists of neighbours to be tested and neighbours that have been tested
             new_neighbours = node.get_neighbours()
-            tested_neighbours = []
+            tested_neighbours = [node.index]
 
             # Looping through every node found until there are none left
-            while np.any(new_neighbours):
+            while len(new_neighbours) > 0:
                 n += 1
 
                 # Adding path lengths to the list
@@ -147,18 +147,16 @@ class Network:
                 # removing unnecessary nodes from this list
                 for i in tested_neighbours:
                     next_new_neighbours = np.delete(next_new_neighbours, np.where(next_new_neighbours == i))
-                next_new_neighbours = np.delete(next_new_neighbours, np.where(next_new_neighbours == node))
                 
                 # asserting the new set of neighbours
                 new_neighbours = next_new_neighbours
 
             # removing 0 values from path length (don't want to record path distance to self)
             path_lengths = np.delete(path_lengths, np.where(path_lengths == 0))
-            print(path_lengths)
             mean_paths.append(statistics.mean(path_lengths))
 
         # calculate mean
-        mean_path_length = statistics.mean(mean_paths)
+        mean_path_length = round(statistics.mean(mean_paths),15)
 
         return mean_path_length
 
