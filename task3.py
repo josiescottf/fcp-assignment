@@ -139,7 +139,7 @@ class Network:
                 next_new_neighbours = []
                 # finding next degree of neighbours 
                 for i in new_neighbours:
-                    next_new_neighbours.append(self.nodes[i].get_neighbours())
+                    next_new_neighbours = np.concatenate((next_new_neighbours, self.nodes[i].get_neighbours()))
 
                 # removing duplicates from this list
                 next_new_neighbours = np.unique(next_new_neighbours)
@@ -148,8 +148,8 @@ class Network:
                 for i in tested_neighbours:
                     next_new_neighbours = np.delete(next_new_neighbours, np.where(next_new_neighbours == i))
                 
-                # asserting the new set of neighbours
-                new_neighbours = next_new_neighbours
+                # asserting the new set of neighbours (dtype=int ensures that the data can be used to iterate through lists later)
+                new_neighbours = np.array(next_new_neighbours, dtype=int)
 
             # removing 0 values from path length (don't want to record path distance to self)
             path_lengths = np.delete(path_lengths, np.where(path_lengths == 0))
@@ -211,7 +211,7 @@ class Network:
         print("Testing one-sided network")
         assert (network.get_mean_degree() == 1), network.get_mean_degree()
         #assert (network.get_clustering() == 0), network.get_clustering()
-        #assert (network.get_path_length() == 5), network.get_path_length()
+        assert (network.get_path_length() == 5), network.get_path_length()
 
         nodes = []
         num_nodes = 10
@@ -237,8 +237,7 @@ def main():
     # adding the parse arguments
     parser.add_argument("--test_network", action='store_true')  # argument to run the tests
     parser.add_argument("--network", nargs=1)  # argument to determine how many nodes in a random network
-    parser.add_argument("--connection_probability", nargs=1,
-                        default=0.5)  # argument to assign connection probability in a random network
+    parser.add_argument("--connection_probability", nargs=1, default=0.5)  # argument to assign connection probability in a random network
 
     args = parser.parse_args()
 
@@ -249,7 +248,9 @@ def main():
     if args.network:
         network.make_random_network(int(args.network[0]), args.connection_probability)
         # finding mean degree of network
-        print(network.get_mean_degree())
+        print('Mean Degree:', network.get_mean_degree())
+        # finding mean path length of the network
+        print('Average Path Length:', network.get_path_length())
 
     # testing functions if test_network flag is given
     if args.test_network:
