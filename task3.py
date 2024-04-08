@@ -170,14 +170,40 @@ class Network:
         Outputs:
             mean_clustering - The mean clustering coefficient of the network
         '''
-        # calculate the clustering coefficient of a node
-        # create list of all neighbours of the node
-        # calculate maximum number of connections between neighbours
-        # find actual number of connections between neighbours
-        # use these to find clustering coefficient
-        # store the clustering coefficient of all nodes in a list
+        
+        clustering_coefficients = []
+
+        for node in self.nodes:
+            # create list of all neighbours of the node
+            neighbours = node.get_neighbours()
+            n = len(neighbours)
+            
+            # calculate maximum number of connections between neighbours
+            max_connections = n * (n-1)/2
+            
+            # Initialise number of connections between neighbours
+            connections = 0
+
+            # find actual number of connections between neighbours
+            for i in neighbours:
+                # get neighbours of the neighbour
+                possible_connections = self.nodes[i].get_neighbours()
+                for j in possible_connections:
+                    # only add to the number of connections if i<j so each connection is only counted once
+                    if i < j and j in neighbours:
+                        connections += 1
+        
+            # find clustering coefficient
+            if max_connections != 0:
+                clustering = connections/max_connections
+            else:
+                clustering = 0
+        
+            # store the clustering coefficient of all nodes in a list
+            clustering_coefficients.append(clustering)
+        
         # calculate mean
-        mean_clustering = 0
+        mean_clustering = statistics.mean(clustering_coefficients)
 
         return mean_clustering
 
@@ -196,7 +222,7 @@ class Network:
 
         print("Testing ring network")
         assert (network.get_mean_degree() == 2), network.get_mean_degree()
-        #assert (network.get_clustering() == 0), network.get_clustering()
+        assert (network.get_mean_clustering() == 0), network.get_clustering()
         assert (network.get_path_length() == 2.777777777777778), network.get_path_length()
 
         nodes = []
@@ -210,7 +236,7 @@ class Network:
 
         print("Testing one-sided network")
         assert (network.get_mean_degree() == 1), network.get_mean_degree()
-        #assert (network.get_clustering() == 0), network.get_clustering()
+        assert (network.get_mean_clustering() == 0), network.get_clustering()
         assert (network.get_path_length() == 5), network.get_path_length()
 
         nodes = []
@@ -224,7 +250,7 @@ class Network:
 
         print("Testing fully connected network")
         assert (network.get_mean_degree() == num_nodes - 1), network.get_mean_degree()
-        #assert (network.get_clustering() == 1), network.get_clustering()
+        assert (network.get_mean_clustering() == 1), network.get_clustering()
         assert (network.get_path_length() == 1), network.get_path_length()
 
         print("All tests passed")
@@ -251,6 +277,8 @@ def main():
         print('Mean Degree:', network.get_mean_degree())
         # finding mean path length of the network
         print('Average Path Length:', network.get_path_length())
+        # finding mean clustering coefficient of the network
+        print('Clustering co-efficient:', network.get_mean_clustering())
 
     # testing functions if test_network flag is given
     if args.test_network:
