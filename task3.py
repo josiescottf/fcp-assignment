@@ -261,9 +261,12 @@ def main():
     parser = argparse.ArgumentParser()
 
     # adding the parse arguments
-    parser.add_argument("--test_network", action='store_true')  # argument to run the tests
-    parser.add_argument("--network", nargs=1)  # argument to determine how many nodes in a random network
-    parser.add_argument("--connection_probability", nargs=1, default=0.5)  # argument to assign connection probability in a random network
+    # argument to run the tests
+    parser.add_argument("--test_network", action='store_true') 
+    # argument to determine how many nodes in a random network
+    parser.add_argument("--network", nargs=1)  
+     # argument to assign connection probability in a random network
+    parser.add_argument("--connection_probability", nargs=1, default=0.5) 
 
     args = parser.parse_args()
 
@@ -272,7 +275,7 @@ def main():
 
     # creating a random network if network flag is given
     if args.network:
-        network.make_random_network(int(args.network[0]), args.connection_probability)
+        network.make_random_network(int(args.network[0]), args.connection_probability[0])
         # finding mean degree of network
         print('Mean Degree:', network.get_mean_degree())
         # finding mean path length of the network
