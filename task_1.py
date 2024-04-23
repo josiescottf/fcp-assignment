@@ -63,8 +63,12 @@ def calculate_agreement(population, row, col, external=0.0):
     #increases agreement using the external pull value
     agreement += external * self_opinion
     return agreement
+<<<<<<< HEAD
     #Your code for task 1 goes here
 #    return np.random * population
+=======
+
+>>>>>>> e2bb1db64f89e4a8d5e9af273e6391975a83bd10
     
 def ising_step(population, external=0.0, alpha=1):
     '''
