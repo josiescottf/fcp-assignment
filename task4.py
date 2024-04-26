@@ -47,24 +47,44 @@ class Network:
         
           
     def make_ring_network(self, N, neighbour_range=1):
-        self.nodes = []
-        for node_number in range(N):
-            connections = [0] * N
+        '''
+        this function creates a ring network where each node is connected to its nearest neighbours
+
+        parameters:
+        N = number of nodes in the network
+        neighbour_range = number of nearest neighbours each node connects to
+        '''
+        self.nodes = [] # initialises an empty list to store nodes
+        for node_number in range(N): 
+            connections = [0] * N # initialises connections for the node
             for i in range(1, neighbour_range + 1):
+                # calculates indices of left and right neighbour in the ring
                 left_neighbor_index = (node_number - i) % N
                 right_neighbor_index = (node_number + i) % N
                 if left_neighbor_index != node_number:
+                    # connects to the left neighbour if it's not the same as the current node
                     connections[left_neighbor_index] = 1
                 if right_neighbor_index != node_number:
+                    # connects to the right neighbour if it's not the same as the current node
                     connections[right_neighbor_index] = 1
+            # creates a new node with the calculated connections
             new_node = Node(0, node_number, connections=connections)
-            self.nodes.append(new_node)
+            self.nodes.append(new_node) # adds the node to the network
 
     def make_small_world_network(self, N, re_wire_prob=0.1):
-        self.make_ring_network(N, neighbour_range=2) #Start with a ring network of range 2
-        for node in self.nodes:
+        '''
+        this function creates a small-world network by rewiring some connections of a ring network
+
+        parameters:
+        N = number of nodes in the network
+        re_wire_prob = probability of rewiring a connection
+        '''
+        self.make_ring_network(N, neighbour_range=2) #starts with a ring network of range 2
+        for node in self.nodes
             for neighbour_index, connection in enumerate(node.connections):
+                # checks if there is a connection and apply rewiring with a certain probability
                 if connection == 1 and random.random() < re_wire_prob:
+                    # choose a new neighbour index for rewiring
                     new_neighbour_index = random.choice([i for i in range(N) if i!= node.index and i != neighbour_index])
                     node.connections[neighbour_index] = 0
                     self.nodes[neighbour_index].connections[node.index] = 0
@@ -80,6 +100,15 @@ class Network:
         network_radius = num_nodes * 10
         ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
         ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
+
+        each_small_circle_radius = 0.3 * num_nodes
+        if (num_nodes>2):
+            each_arc_angle = 360 / num_nodes
+            step1 = network_radius * np.sin(np.deg2rad(each_arc_angle))
+            step2 = 180 - each_arc_angle
+            step3 = step2/2
+            step4 = 2 * np.sin(np.deg2rad(step3))
+            each_small_circle_radius = (step1 / step4) - 2
 
         for (i, node) in enumerate(self.nodes):
             node_angle = i * 2 * np.pi / num_nodes

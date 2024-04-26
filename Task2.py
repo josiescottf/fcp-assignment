@@ -80,7 +80,6 @@ def test_compare():
     beta = 0.2
     assert compare(opinions, threshold, beta) == [0.5, 0.5, 0.5] # Tests that the compare equations work when the difference is greater than the threshold.
 
-
 def test_interact():
     no_opinions = 10
     threshold = 0.1
@@ -95,6 +94,7 @@ def test_y_values():
     y_list, x_list = y_values(stored_opinions)
     assert y_list == [0.1, 0.2, 0.3, 0.2, 0.3, 0.4]
     assert x_list == [0, 0, 0, 1, 1, 1]
+
 def test_all_functions():
     test_initial_opinion()
     print('Initial opinion test passed')
