@@ -81,6 +81,15 @@ class Network:
         ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
         ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
 
+        each_small_circle_radius = 0.3 * num_nodes
+        if (num_nodes>2):
+            each_arc_angle = 360 / num_nodes
+            step1 = network_radius * np.sin(np.deg2rad(each_arc_angle))
+            step2 = 180 - each_arc_angle
+            step3 = step2/2
+            step4 = 2 * np.sin(np.deg2rad(step3))
+            each_small_circle_radius = (step1 / step4) - 2
+
         for (i, node) in enumerate(self.nodes):
             node_angle = i * 2 * np.pi / num_nodes
             node_x = network_radius * np.cos(node_angle)
