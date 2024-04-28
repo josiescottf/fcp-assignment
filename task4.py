@@ -80,7 +80,7 @@ class Network:
         re_wire_prob = probability of rewiring a connection
         '''
         self.make_ring_network(N, neighbour_range=2) #starts with a ring network of range 2
-        for node in self.nodes
+        for node in self.nodes:
             for neighbour_index, connection in enumerate(node.connections):
                 # checks if there is a connection and apply rewiring with a certain probability
                 if connection == 1 and random.random() < re_wire_prob:
@@ -292,21 +292,30 @@ This section contains code for the main function- you should write some code for
  '''
 
 def main():
+    #sets up arguments parser
     parser = argparse.ArgumentParser(description='Generate ring or small-world networks.')
+    
+    #defines command-line arguments
     parser.add_argument('-ring_network', type=int, help='Generate a ring network of specified size with default range 1')
     parser.add_argument('-small_world', type=int, help='Generate a small-world network of specified size with default parameters')
     parser.add_argument('-re_wire', type=float, default=0.1, help='Set the re-wiring probability for small-world network (default: 0.1)')
+    
+    #parses command-line arguments
     args = parser.parse_args()
 
+    #extracts values from arguments
     ring_size = args.ring_network
     small_world_size = args.small_world
     re_wire_prob = args.re_wire
 
+    #generates network based on provided arguments
     if ring_size:
+        #generates and plots ring network
         ring = Network()
         ring.make_ring_network(ring_size)
         ring.plot()
     elif small_world_size:
+        #generates and plots small-world network
         small_world = Network()
         small_world.make_small_world_network(small_world_size, re_wire_prob)
         small_world.plot()
