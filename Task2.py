@@ -5,14 +5,22 @@ import argparse
 
 
 def initial_opinions(no_opinions):
-    '''Creating a list of values between 1 and 0 of a variable length'''
+    '''
+    Creating a list of values between 1 and 0 of a variable length
+    Input: no_opinions
+    Output: List of random values between 0 and 1 of length no_opinions
+    '''
     return np.random.random(no_opinions)
 
 
 def compare(opinions, threshold, beta):
-    '''Compares the value of the randomly selected person and a random neighbour'''
+    '''
+    Compares the value of the randomly selected person and a random neighbour
+    Input: opinions, threshold, beta
+    Output: Updated list of opinions
+    '''
     for i in range(len(opinions)):
-        person_index = random.randint(0, len(opinions)-1)  # Random index for a 'person'.
+        person_index = random.randint(0, len(opinions)-1)  # Gets a random index for a 'person'.
         # Fixes the edge cases
         if person_index == 0:
             neighbours_index = 1  # Only chooses neighbor to the right.
@@ -31,7 +39,11 @@ def compare(opinions, threshold, beta):
 
 
 def interact(no_opinions, threshold, beta, repetitions):
-    '''Compares all of the 'people' and 'neighbours' for a variable amount of iterations'''
+    '''
+    Compares all of the 'people' and 'neighbours' for a variable amount of iterations
+    Input: no_opinions, threshold, beta, repetitions
+    Output: Updated list of opinions and a list of all the opinions stored over time (stored_opinions_grid)
+    '''
     opinions_grid = initial_opinions(no_opinions)
     stored_opinions_grid = [opinions_grid.copy()]  # Stores a copy of the initial state
 
@@ -43,7 +55,11 @@ def interact(no_opinions, threshold, beta, repetitions):
 
 
 def y_values(stored_opinions_grid):
-    '''Extracts the y-values (opinions) and corresponding x-values (time steps) from a list of opinions stored over multiple time steps'''
+    '''
+    Extracts the y-values (opinions) and corresponding x-values (time steps) from a list of opinions stored over multiple time steps
+    Input: The list of all the opinions stored over time (stored_opinions_grid)
+    Output: Two lists, y_list and x_list for the scatter graph
+    '''
     y_list = []
     x_list = []
     for index, opinions in enumerate(stored_opinions_grid):  # Enumerate gives us both the index of each opinion and the opinion itself.
@@ -68,6 +84,7 @@ def plot_hist(ax, opinions_list):
 
 
 def argparse_function():
+    ''' Function to parse the arguments from the command line'''
     parser = argparse.ArgumentParser()
     parser.add_argument('-defuant', action='store_true')  # Set a flag for -defuant.
     parser.add_argument('-beta', type=float, default=0.2)  # Set default to 0.2 for beta and threshold.
@@ -76,15 +93,15 @@ def argparse_function():
 
 
 def test_initial_opinion():
-    assert len(initial_opinions(10)) == 10
-    assert all(0 <= x <= 1 for x in initial_opinions(10))
+    assert len(initial_opinions(10)) == 10 # Checks if the length of the list is equal to the input.
+    assert all(0 <= x <= 1 for x in initial_opinions(10)) # Checks if all the values in the list are between 0 and 1.
 
 
 def test_compare():
-    opinions = [0.5, 0.5, 0.5]
-    threshold = 0.1
+    opinions = [0.6, 0.5, 0.6]
+    threshold = 0.5
     beta = 0.2
-    assert compare(opinions, threshold, beta) == [0.5, 0.5, 0.5]
+    assert compare(opinions, threshold, beta) == [0.55, 0.5, 0.55]   # Checks if the compare function works for a difference of 0.1.
 
 
 def test_interact():
@@ -116,18 +133,18 @@ def test_all_functions():
 
 
 def main():
-    args = argparse_function()
+    args = argparse_function() 
 
     no_opinions = 100  # Defines variables.
-    threshold = args.threshold
+    threshold = args.threshold # Sets the threshold and beta to the input values.
     beta = args.beta
     repetitions = 100
 
-    opinions_grid, stored_opinions_grid = interact(no_opinions, threshold, beta, repetitions)
+    opinions_grid, stored_opinions_grid = interact(no_opinions, threshold, beta, repetitions) 
 
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6))
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 6)) # Creates the subplots.
 
-    plot_hist(ax1, opinions_grid)
+    plot_hist(ax1, opinions_grid) 
     plot_scatter(ax2, stored_opinions_grid)
     fig.suptitle(f'Coupling: {beta} and Threshold: {threshold}')
 
