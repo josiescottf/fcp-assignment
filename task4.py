@@ -101,15 +101,16 @@ class Network:
         ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
         ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
 
+        #initialises the radius of each small circle as 0.3 times the number of nodes
         each_small_circle_radius = 0.3 * num_nodes
-        if (num_nodes>2):
-            each_arc_angle = 360 / num_nodes
-            step1 = network_radius * np.sin(np.deg2rad(each_arc_angle))
-            step2 = 180 - each_arc_angle
-            step3 = step2/2
-            step4 = 2 * np.sin(np.deg2rad(step3))
-            each_small_circle_radius = (step1 / step4) - 2
-
+        if num_nodes > 2: 
+            each_arc_angle = 360 / num_nodes #calculates the angle of each arc between adjacent nodes in a circular layout
+            angle_difference = 180 - each_arc_angle #calculates the difference between 180 degrees and each arc angle
+            half_angle_difference = angle_difference / 2 
+            sine_half_angle_difference = np.sin(np.deg2rad(half_angle_difference)) #calculates the sine of half the angle difference
+            radius_ratio = network_radius * np.sin(np.deg2rad(each_arc_angle)) / (2 * sine_half_angle_difference) #calculates the ratio to adjust the radius of each node
+            each_small_circle_radius = radius_ratio - 2 # adjustd the radius of each node and subtracts 2 for fine tuning
+        
         for (i, node) in enumerate(self.nodes):
             node_angle = i * 2 * np.pi / num_nodes
             node_x = network_radius * np.cos(node_angle)
