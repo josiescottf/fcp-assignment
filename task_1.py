@@ -149,7 +149,8 @@ def test_ising():
 #Main function for ising model - Task 1
 def ising_main(population, alpha=None, external=0.0):
     '''
-    This function forms the main plot
+    This function forms the main plot.
+    Each frame shown has updated the plot 1000 times. 100 frames are shown
     Inputs: population (numpy array)
             alpha (float) - optional - the magnitude of the alpha value to be used in calculation
             external (float) - optional - the magnitude of any external "pull" on opinion
