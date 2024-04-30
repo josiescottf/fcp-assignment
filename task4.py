@@ -49,10 +49,12 @@ class Network:
     def make_ring_network(self, N, neighbour_range=1):
         '''
         this function creates a ring network where each node is connected to its nearest neighbours
-
-        parameters:
-        N = number of nodes in the network
-        neighbour_range = number of nearest neighbours each node connects to
+        
+        inputs: 
+        self, N, neighbour_range
+        
+        outputs: 
+        modifies 'self.nodes'
         '''
         self.nodes = [] # initialises an empty list to store nodes
         for node_number in range(N): 
@@ -74,10 +76,12 @@ class Network:
     def make_small_world_network(self, N, re_wire_prob=0.1):
         '''
         this function creates a small-world network by rewiring some connections of a ring network
+        
+        inputs:
+        self, N, re_wire_prob
 
-        parameters:
-        N = number of nodes in the network
-        re_wire_prob = probability of rewiring a connection
+        outputs:
+        modifies 'self.nodes'
         '''
         self.make_ring_network(N, neighbour_range=2) #starts with a ring network of range 2
         for node in self.nodes:
