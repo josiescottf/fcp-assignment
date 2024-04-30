@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
 import argparse
-import sys
 import random
 import math
 
@@ -62,6 +61,10 @@ def calculate_agreement(population, row, col, external=0.0):
     agreement += external * self_opinion
     return agreement
 
+<<<<<<< HEAD
+=======
+    
+>>>>>>> ed5a8c5a4d35a52b51877eef848d2a589988cbc5
 def ising_step(population, external=0.0, alpha=1):
     '''
     This function will perform a single update of the Ising model

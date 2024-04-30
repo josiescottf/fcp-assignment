@@ -47,24 +47,48 @@ class Network:
         
           
     def make_ring_network(self, N, neighbour_range=1):
-        self.nodes = []
-        for node_number in range(N):
-            connections = [0] * N
+        '''
+        this function creates a ring network where each node is connected to its nearest neighbours
+        
+        inputs: 
+        self, N, neighbour_range
+        
+        outputs: 
+        modifies 'self.nodes'
+        '''
+        self.nodes = [] # initialises an empty list to store nodes
+        for node_number in range(N): 
+            connections = [0] * N # initialises connections for the node
             for i in range(1, neighbour_range + 1):
+                # calculates indices of left and right neighbour in the ring
                 left_neighbor_index = (node_number - i) % N
                 right_neighbor_index = (node_number + i) % N
                 if left_neighbor_index != node_number:
+                    # connects to the left neighbour if it's not the same as the current node
                     connections[left_neighbor_index] = 1
                 if right_neighbor_index != node_number:
+                    # connects to the right neighbour if it's not the same as the current node
                     connections[right_neighbor_index] = 1
+            # creates a new node with the calculated connections
             new_node = Node(0, node_number, connections=connections)
-            self.nodes.append(new_node)
+            self.nodes.append(new_node) # adds the node to the network
 
     def make_small_world_network(self, N, re_wire_prob=0.1):
-        self.make_ring_network(N, neighbour_range=2) #Start with a ring network of range 2
+        '''
+        this function creates a small-world network by rewiring some connections of a ring network
+        
+        inputs:
+        self, N, re_wire_prob
+
+        outputs:
+        modifies 'self.nodes'
+        '''
+        self.make_ring_network(N, neighbour_range=2) #starts with a ring network of range 2
         for node in self.nodes:
             for neighbour_index, connection in enumerate(node.connections):
+                # checks if there is a connection and apply rewiring with a certain probability
                 if connection == 1 and random.random() < re_wire_prob:
+                    # choose a new neighbour index for rewiring
                     new_neighbour_index = random.choice([i for i in range(N) if i!= node.index and i != neighbour_index])
                     node.connections[neighbour_index] = 0
                     self.nodes[neighbour_index].connections[node.index] = 0
@@ -81,6 +105,16 @@ class Network:
         ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
         ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
 
+        #initialises the radius of each small circle as 0.3 times the number of nodes
+        each_small_circle_radius = 0.3 * num_nodes
+        if num_nodes > 2: 
+            each_arc_angle = 360 / num_nodes #calculates the angle of each arc between adjacent nodes in a circular layout
+            angle_difference = 180 - each_arc_angle #calculates the difference between 180 degrees and each arc angle
+            half_angle_difference = angle_difference / 2 
+            sine_half_angle_difference = np.sin(np.deg2rad(half_angle_difference)) #calculates the sine of half the angle difference
+            radius_ratio = network_radius * np.sin(np.deg2rad(each_arc_angle)) / (2 * sine_half_angle_difference) #calculates the ratio to adjust the radius of each node
+            each_small_circle_radius = radius_ratio - 2 # adjustd the radius of each node and subtracts 2 for fine tuning
+        
         for (i, node) in enumerate(self.nodes):
             node_angle = i * 2 * np.pi / num_nodes
             node_x = network_radius * np.cos(node_angle)
@@ -263,21 +297,30 @@ This section contains code for the main function- you should write some code for
  '''
 
 def main():
+    #sets up arguments parser
     parser = argparse.ArgumentParser(description='Generate ring or small-world networks.')
+    
+    #defines command-line arguments
     parser.add_argument('-ring_network', type=int, help='Generate a ring network of specified size with default range 1')
     parser.add_argument('-small_world', type=int, help='Generate a small-world network of specified size with default parameters')
     parser.add_argument('-re_wire', type=float, default=0.1, help='Set the re-wiring probability for small-world network (default: 0.1)')
+    
+    #parses command-line arguments
     args = parser.parse_args()
 
+    #extracts values from arguments
     ring_size = args.ring_network
     small_world_size = args.small_world
     re_wire_prob = args.re_wire
 
+    #generates network based on provided arguments
     if ring_size:
+        #generates and plots ring network
         ring = Network()
         ring.make_ring_network(ring_size)
         ring.plot()
     elif small_world_size:
+        #generates and plots small-world network
         small_world = Network()
         small_world.make_small_world_network(small_world_size, re_wire_prob)
         small_world.plot()
