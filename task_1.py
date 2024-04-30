@@ -42,6 +42,9 @@ def get_neighbour_opinions(population, i, j):
 def calculate_agreement(population, row, col, external=0.0):
     '''
     This function should return the *change* in agreement of the cell at (row, col)
+    This is done by running through a list of the selected cell's neighbours and adding the (neighbour's * cell's) opinions to
+    the agreement value. Also, if there is an external value present this is multiplied by the cell's opinion and added
+    to the agreement value.
     Inputs: population (numpy array)
             row (int)
             col (int)
