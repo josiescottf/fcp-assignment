@@ -184,25 +184,46 @@ class Network:
 
 
     def make_ring_network(self, N, neighbour_range=1):
-        self.nodes = []
+        '''
+        A function that creates a ring network where each node is connected to its nearest neighbours
+
+        Inputs:
+            self, N, neighbour_range
+        Output:
+            modifies 'self.nodes'
+        '''
+        self.nodes = [] # initialise an empty list to store nodes
         for node_number in range(N):
-            connections = [0] * N
+            connections = [0] * N # initialise connections for the node
             for i in range(1, neighbour_range + 1):
+                # calculate indices of left and right neighbour in the ring
                 left_neighbor_index = (node_number - i) % N
                 right_neighbor_index = (node_number + i) % N
                 if left_neighbor_index != node_number:
+                    # connect to the left neighbour if it's not the same as the current node
                     connections[left_neighbor_index] = 1
                 if right_neighbor_index != node_number:
+                    # connect to the right neighbour if it's not the same as the current node
                     connections[right_neighbor_index] = 1
+            # create a new node with the calculated connections
             new_node = Node(0, node_number, connections=connections)
-            self.nodes.append(new_node)
+            self.nodes.append(new_node) # add the node to the network
 
 
     def make_small_world_network(self, N, re_wire_prob=0.1):
+        '''
+        A function that creates a small-world network by rewiring some connections of a ring network
+        Inputs:
+            self, N, re_wire_prob
+        Output:
+            modifies 'self.nodes'
+        '''
         self.make_ring_network(N, neighbour_range=2) #Start with a ring network of range 2
         for node in self.nodes:
             for neighbour_index, connection in enumerate(node.connections):
+                # check if there is a connection and apply rewiring with a certain probability
                 if connection == 1 and random.random() < re_wire_prob:
+                    # choose a new neighbour index for rewiring
                     new_neighbour_index = random.choice([i for i in range(N) if i!= node.index and i != neighbour_index])
                     node.connections[neighbour_index] = 0
                     self.nodes[neighbour_index].connections[node.index] = 0
