@@ -588,8 +588,25 @@ def defuant_main(no_opinions, threshold, beta, repetitions):
     plt.tight_layout()
     plt.show()
 
-def network_main():
-    make_small_world_network(self, network_size, 0.2)
+def network_main(network_size, connection_probability):
+    # Creating a random network
+    network = Network()
+    network.make_random_network(int(network_size[0]), connection_probability)
+
+    # Finding mean degree, mean path length and mean clustering coefficient
+    print('Mean Degree:', network.get_mean_degree())
+    print('Average Path Length:', network.get_path_length())
+    print('Clustering co-efficient:', network.get_mean_clustering())
+
+def small_world_main(small_world_size, re_wire_prob):
+    small_world = Network()
+    small_world.make_small_world_network(small_world_size, re_wire_prob)
+    small_world.plot()
+
+def ring_main(ring_size):
+    ring = Network()
+    ring.make_ring_network(ring_size)
+    ring.plot()
 
 def main():
     parser = argparse.ArgumentParser()
@@ -603,11 +620,14 @@ def main():
     parser.add_argument('-beta', type=float, default=0.2) # multiplier for opinion change in defuant
     parser.add_argument("-threshold", type=float, default=0.2) # opinion change threshold in defuant
     parser.add_argument("-use_network", nargs=1, default=10) # flag to use network in ising model
-    parser.add_argument("--test_network", action="store_true") # runs network tests
-    parser.add_argument("--network", nargs=1) # determines how many nodes there will be in a random network
-    parser.add_argument("--connection_probability", nargs=1, default=0.5) # assigns connection probability in a random network
-    parser.add_argument("--no_opinions", nargs=1, default=100) # number of opinions to analyse in defuant
-    parser.add_argument("--repetitions", nargs=1, default=100) # number of repetitions for defuant
+    parser.add_argument("-test_network", action="store_true") # runs network tests
+    parser.add_argument("-network", nargs=1) # determines how many nodes there will be in a random network
+    parser.add_argument("-connection_probability", nargs=1, default=0.5) # assigns connection probability in a random network
+    parser.add_argument("-no_opinions", nargs=1, default=100) # number of opinions to analyse in defuant
+    parser.add_argument("-repetitions", nargs=1, default=100) # number of repetitions for defuant
+    parser.add_argument("-ring_network", type=int, default=1, help='Generate a ring network of specified size with default range 1')
+    parser.add_argument("-small_world", type=int, help='Generate a small-world network of specified size with defualt parameters')
+    parser.add_argument('-re_wire', type=float, default=0.1, help='Set the re-wiring probability for small-world network (default:0.1)')
     
     #Defining the variables
     args = parser.parse_args()
@@ -617,6 +637,11 @@ def main():
     threshold = args.threshold
     beta = args.beta
     repetitions = args.repetitions
+    connection_probability = args.connection_probability
+    ring_size = args.ring_network
+    small_world_size = args.small_world
+    re_wire_prob = args.re_wire
+
 
     #checks for '-ising_model' flag and creates a population and runs main code if present
     if args.ising_model:
@@ -627,13 +652,30 @@ def main():
             pop = np.random.choice([-1,1],size=(100,100))
             ising_main(pop, alpha, external)
     
-    #checks for '-test_ising' flag and runs tests fucntion if present
+    #checks for '-test_ising' flag and runs ising test fucntion if present
     if args.test_ising:
         test_ising()
 
     # checks for '-defuant' flag and runs the defuant model
     if args.defuant:
         defuant_main(no_opinions, threshold, beta, repetitions)
+
+    # Checks for '-network' flag and generates a random network
+    if args.network:
+        network_main(args.network, connection_probability)
+
+    # Tests network functions if network flag given
+    if args.test_network:
+        network = Network()
+        network.test_networks()
+
+    # Check for ring network flag and creates a ring network
+    if args.ring_network:
+        ring_main(ring_size)
+
+    # Checks for small world flag and creates a small world network
+    if args.small_world:
+        small_world_main(small_world_size, re_wire_prob)
 
 
 if __name__=="__main__":
