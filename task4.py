@@ -49,10 +49,12 @@ class Network:
     def make_ring_network(self, N, neighbour_range=1):
         '''
         this function creates a ring network where each node is connected to its nearest neighbours
-
-        parameters:
-        N = number of nodes in the network
-        neighbour_range = number of nearest neighbours each node connects to
+        
+        inputs: 
+        self, N, neighbour_range
+        
+        outputs: 
+        modifies 'self.nodes'
         '''
         self.nodes = [] # initialises an empty list to store nodes
         for node_number in range(N): 
@@ -74,10 +76,12 @@ class Network:
     def make_small_world_network(self, N, re_wire_prob=0.1):
         '''
         this function creates a small-world network by rewiring some connections of a ring network
+        
+        inputs:
+        self, N, re_wire_prob
 
-        parameters:
-        N = number of nodes in the network
-        re_wire_prob = probability of rewiring a connection
+        outputs:
+        modifies 'self.nodes'
         '''
         self.make_ring_network(N, neighbour_range=2) #starts with a ring network of range 2
         for node in self.nodes:
@@ -101,15 +105,16 @@ class Network:
         ax.set_xlim([-1.1*network_radius, 1.1*network_radius])
         ax.set_ylim([-1.1*network_radius, 1.1*network_radius])
 
+        #initialises the radius of each small circle as 0.3 times the number of nodes
         each_small_circle_radius = 0.3 * num_nodes
-        if (num_nodes>2):
-            each_arc_angle = 360 / num_nodes
-            step1 = network_radius * np.sin(np.deg2rad(each_arc_angle))
-            step2 = 180 - each_arc_angle
-            step3 = step2/2
-            step4 = 2 * np.sin(np.deg2rad(step3))
-            each_small_circle_radius = (step1 / step4) - 2
-
+        if num_nodes > 2: 
+            each_arc_angle = 360 / num_nodes #calculates the angle of each arc between adjacent nodes in a circular layout
+            angle_difference = 180 - each_arc_angle #calculates the difference between 180 degrees and each arc angle
+            half_angle_difference = angle_difference / 2 
+            sine_half_angle_difference = np.sin(np.deg2rad(half_angle_difference)) #calculates the sine of half the angle difference
+            radius_ratio = network_radius * np.sin(np.deg2rad(each_arc_angle)) / (2 * sine_half_angle_difference) #calculates the ratio to adjust the radius of each node
+            each_small_circle_radius = radius_ratio - 2 # adjustd the radius of each node and subtracts 2 for fine tuning
+        
         for (i, node) in enumerate(self.nodes):
             node_angle = i * 2 * np.pi / num_nodes
             node_x = network_radius * np.cos(node_angle)

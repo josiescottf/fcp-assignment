@@ -6,8 +6,6 @@ import random
 import math
 
 
-
-
 '''
 ==============================================================================================================
 This section contains code for the Ising Model - task 1 in the assignment
@@ -66,7 +64,6 @@ def calculate_agreement(population, row, col, external=0.0):
     agreement += external * self_opinion
     return agreement
 
-    
 def ising_step(population, external=0.0, alpha=1):
     '''
     This function will perform a single update of the Ising model
@@ -207,7 +204,6 @@ def main():
     if args.test_ising:
         test_ising()
     
-
 
 if __name__=="__main__":
     main()
