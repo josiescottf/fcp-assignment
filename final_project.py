@@ -633,19 +633,19 @@ def main():
     parser = argparse.ArgumentParser()
     
     #adding parse flags
-    parser.add_argument("-ising_model", action='store_true') #runs the ising model with default values
-    parser.add_argument("-external", type=float, default=0) #takes a value to use for the external pull
-    parser.add_argument("-alpha", type=float, default=1) #takes a value to use for alpha
-    parser.add_argument("-test_ising", action='store_true') #checks whether to run the tests
-    parser.add_argument("-defuant", action='store_true') # runs the defuant model
-    parser.add_argument('-beta', type=float, default=0.2) # multiplier for opinion change in defuant
-    parser.add_argument("-threshold", type=float, default=0.2) # opinion change threshold in defuant
-    parser.add_argument("-use_network", nargs=1, default=10) # flag to use network in ising model
-    parser.add_argument("-test_network", action="store_true") # runs network tests
-    parser.add_argument("-network", nargs=1) # determines how many nodes there will be in a random network
-    parser.add_argument("-connection_probability", nargs=1, default=0.5) # assigns connection probability in a random network
-    parser.add_argument("-no_opinions", nargs=1, default=100) # number of opinions to analyse in defuant
-    parser.add_argument("-repetitions", nargs=1, default=100) # number of repetitions for defuant
+    parser.add_argument("-ising_model", action='store_true', help='Run the ising model with default values')
+    parser.add_argument("-external", type=float, default=0, help='Take a value to use for the external pull')
+    parser.add_argument("-alpha", type=float, default=1, help='Take a value to use for alpha')
+    parser.add_argument("-test_ising", action='store_true', help='Check whether to run the tests')
+    parser.add_argument("-defuant", action='store_true', help='Run the defuant model')
+    parser.add_argument('-beta', type=float, default=0.2, help='Multiplier for opinion change in defuant')
+    parser.add_argument("-threshold", type=float, default=0.2, help='Opinion change threshold in defuant')
+    parser.add_argument("-use_network", nargs=1, default=10, help='Flag to use network in ising model')
+    parser.add_argument("-test_network", action="store_true", help='Run network tests')
+    parser.add_argument("-network", nargs=1, help='Determine how many nodes there will be in a random network')
+    parser.add_argument("-connection_probability", nargs=1, default=0.5, help='Assign connection probability in a random network')
+    parser.add_argument("-no_opinions", nargs=1, default=100, help='Number of opinions to analyse in defuant')
+    parser.add_argument("-repetitions", nargs=1, default=100, help='Number of repetitions for defuant')
     parser.add_argument("-ring_network", type=int, default=1, help='Generate a ring network of specified size with default range 1')
     parser.add_argument("-small_world", type=int, help='Generate a small-world network of specified size with defualt parameters')
     parser.add_argument('-re_wire', type=float, default=0.1, help='Set the re-wiring probability for small-world network (default:0.1)')
@@ -697,7 +697,6 @@ def main():
     # Checks for small world flag and creates a small world network
     if args.small_world:
         small_world_main(small_world_size, re_wire_prob)
-
 
 if __name__=="__main__":
     main()
