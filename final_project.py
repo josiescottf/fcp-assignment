@@ -4,7 +4,6 @@ import matplotlib.cm as cm
 import argparse
 import random
 import math
-import statistics 
 
 # Import node class
 class Node:
@@ -54,7 +53,7 @@ class Network:
             degrees.append(degree)
 
         # calculate mean
-        mean_degree = statistics.mean(degrees)
+        mean_degree = np.mean(degrees)
 
         return mean_degree
 
@@ -76,7 +75,6 @@ class Network:
             path_lengths = np.zeros(len(self.nodes))
             # Initialising path length covered
             n = 0
-            
             # Initalising lists of neighbours to be tested and neighbours that have been tested
             new_neighbours = node.get_neighbours()
             tested_neighbours = [node.index]
@@ -110,10 +108,10 @@ class Network:
 
             # removing 0 values from path length (don't want to record path distance to self)
             path_lengths = np.delete(path_lengths, np.where(path_lengths == 0))
-            mean_paths.append(statistics.mean(path_lengths))
+            mean_paths.append(np.mean(path_lengths))
 
         # calculate mean
-        mean_path_length = round(statistics.mean(mean_paths),15)
+        mean_path_length = round(np.mean(mean_paths),15)
 
         return mean_path_length
 
@@ -160,7 +158,7 @@ class Network:
             clustering_coefficients.append(clustering)
         
         # calculate mean
-        mean_clustering = statistics.mean(clustering_coefficients)
+        mean_clustering = np.mean(clustering_coefficients)
 
         return mean_clustering
 
@@ -188,13 +186,17 @@ class Network:
         A function that creates a ring network where each node is connected to its nearest neighbours
 
         Inputs:
-            self, N, neighbour_range
+            self
+            N - Number of nodes in the network
+            neighbour_range - Range of neighbours to connect to 
         Output:
-            modifies 'self.nodes'
+            self - network with newly assigned nodes
         '''
-        self.nodes = [] # initialise an empty list to store nodes
+        # initialise an empty list to store nodes
+        self.nodes = [] 
         for node_number in range(N):
-            connections = [0] * N # initialise connections for the node
+            # initialise connections for the node
+            connections = [0] * N 
             for i in range(1, neighbour_range + 1):
                 # calculate indices of left and right neighbour in the ring
                 left_neighbor_index = (node_number - i) % N
@@ -206,17 +208,20 @@ class Network:
                     # connect to the right neighbour if it's not the same as the current node
                     connections[right_neighbor_index] = 1
             # create a new node with the calculated connections
-            new_node = Node(0, node_number, connections=connections)
-            self.nodes.append(new_node) # add the node to the network
+            new_node = Node(np.random.random(), node_number, connections=connections)
+            # add the node to the network
+            self.nodes.append(new_node) 
 
 
     def make_small_world_network(self, N, re_wire_prob=0.1):
         '''
         A function that creates a small-world network by rewiring some connections of a ring network
         Inputs:
-            self, N, re_wire_prob
+            self
+            N - number of nodes in the network
+            re_wire_prob - Probability of re-wiring a connection
         Output:
-            modifies 'self.nodes'
+            self - network with newly assigned nodes
         '''
         self.make_ring_network(N, neighbour_range=2) #Start with a ring network of range 2
         for node in self.nodes:
@@ -230,6 +235,12 @@ class Network:
                     node.connections[new_neighbour_index] = 1
                     self.nodes[new_neighbour_index].connections[node.index] = 1
 
+<<<<<<< HEAD
+=======
+        return self
+
+
+>>>>>>> origin
     def plot(self):
         fig = plt.figure()
         ax = fig.add_subplot(111)
@@ -312,11 +323,12 @@ This section contains code for the Ising Model - task 1 in the assignment
 def get_neighbour_opinions(population, i, j):
     '''
     This function returns a list of the neighbouring (right, left, above and below) peoples' opinions
-    Inputs: population (numpy array)
-            i (int) - row of person whos neighbours' opinions are being collected
-            j (int) - column of person whos neighbours' opinions are being collected
+    Inputs: 
+        population (numpy array)
+        i (int) - row of person whos neighbours' opinions are being collected
+        j (int) - column of person whos neighbours' opinions are being collected
     Returns:
-            list of neighbours' opinions
+        neighbours - list of neighbours' opinions
     '''
     #initializing 2 variables that are equal to the amount of rows and columns there are in the population
     n,m = population.shape
@@ -337,12 +349,13 @@ def get_neighbour_opinions(population, i, j):
 def calculate_agreement(population, row, col, external=0.0):
     '''
     This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
-    Inputs: population (numpy array)
-            row (int)
-            col (int)
-            external (float) - optional - the magnitude of any external "pull" on opinion
+    Inputs: 
+        population (numpy array)
+        row (int)
+        col (int)
+        external (float) - optional - the magnitude of any external "pull" on opinion
     Returns:
-            change_in_agreement (float)
+        change_in_agreement (float)
     '''
     #initializing the agreement value
     agreement = 0
@@ -358,32 +371,45 @@ def calculate_agreement(population, row, col, external=0.0):
     agreement += external * self_opinion
     return agreement
 
-def calculate_agreement_network(node, external):
-        '''
-        Function to calculate the change in agreement of a node
-        '''
+def calculate_agreement_network(network, node_number, external):
+    '''
+    Function to calculate the change in agreement of a node in a network
+    Inputs:
+        network - The network containing the node
+        node_number - The index of the node to be analysed
+        external - The magnitude of any external "pull" on opinions
+    Outputs:
+        agreement - The change in agreement of the node
+    '''
+    primary_node = network.nodes[node_number]
 
-        #initializing the agreement value
-        agreement = 0
-    
-        # Find the neighbours of the node
-        neighbour_opinions = node.get_neighbours()
+    #initializing the agreement value and opinions
+    agreement = 0
+    neighbour_opinions = []
 
-        #calculating the agreement
-        for opinion in neighbour_opinions:
-            #increases agreement if opinions are the same but will decrease if they oppose
-            agreement += node * opinion
-        #increases agreement using the external pull value
-        agreement += external * node
+    # Find the neighbours of the node
+    neighbours = primary_node.get_neighbours()
+    for node in neighbours:
+        node = network.nodes[node]
+        neighbour_opinions.append(node.value)
 
-        return agreement  
+    #calculating the agreement
+    for opinion in neighbour_opinions:
+        #increases agreement if opinions are the same but will decrease if they oppose
+        agreement += node.value * opinion
+
+    #increases agreement using the external pull value
+    agreement += external * node.value
+
+    return agreement  
 
 def ising_step(population, external=0.0, alpha=1):
     '''
     This function will perform a single update of the Ising model
-    Inputs: population (numpy array)
-            external (float) - optional - the magnitude of any external "pull" on opinion
-            alpha (float) - optional - the magnitude of the alpha value to be used in calculation
+    Inputs: 
+        population (numpy array)
+        external (float) - optional - the magnitude of any external "pull" on opinion
+        alpha (float) - optional - the magnitude of the alpha value to be used in calculation
     '''
     
     #setting the values of the number of columns and rows based on the population
@@ -410,6 +436,51 @@ def ising_step(population, external=0.0, alpha=1):
             #negating the opinion if the random number is less than p
             population[row, col] *= -1
     
+def ising_network_step(network, external=0.0, alpha=1):
+    '''
+    This function will perform a single update of the Ising model for a network
+    Inputs: 
+        network - a network of nodes with opinions
+        external (float) - optional - the magnitude of any external "pull" on opinion
+        alpha (float) - optional - the magnitude of the alpha value to be used in calculation
+    '''
+
+    node_number = np.random.randint(0, len(network.nodes))
+    node = network.nodes[node_number]
+    
+    #setting the agreement to the result of the value given after running the calculation fucntion
+    agreement = calculate_agreement_network(network, node_number, external)
+    
+    #negating the opinion of the person if the agreement is negative
+    if agreement < 0:
+        node.value *= -1
+    
+    #if opinion wasn't negated, this elif runs a random chance that they may be negated anyway
+    elif alpha:
+        #producing random number between 0 and 1
+        random_number = random.random()
+        #calculating probability of opinion flip
+        p = math.e**(-agreement/alpha)
+        #checking if random number is less than p
+        if random_number < p:
+            #negating the opinion if the random number is less than p
+            node.value *= -1
+
+def mean_opinion(network):
+    """
+    Calculate the mean opinion of all the nodes at each evolution step.
+    Inputs:
+        network - A network of opinions
+    Outputs:
+        mean_opinion - The mean opinion of the network
+    """
+    
+    opinions = [node.value for node in network.nodes]
+    mean_opinion = np.mean(opinions)
+
+    return mean_opinion
+    
+
 def plot_ising(im, population):
     '''
     This function will display a plot of the Ising model
@@ -422,6 +493,7 @@ def plot_ising(im, population):
     im.set_data(new_im)
     #slight pause so that each frame is shown temporarily
     plt.pause(0.01)
+
     
 def test_ising():
     '''
@@ -454,25 +526,49 @@ def test_ising():
     print("Tests passed")
 
 
-def ising_network(network, alpha=None, external=0):
+def ising_network(ising_network_size, alpha=None, external=0):
     '''
     This function forms the main plot for the ising model on a network
     Inputs:
-        network 
+        ising_network_size - Number of nodes in the small world network to be analysed
         alpha - (optional) the magnitude of the alpha value to be used in calculation
         external - (optional) the magnitude of any external "pull" on opinion
     '''
-    # creating the plot
 
-    # iterating an update 100 times
+    network = Network()
+    mean_opinions = []
+    steps = np.arange(1,11,1)
+    small_world_network = network.make_small_world_network(ising_network_size)
+    # set a random value for opinions of each node, either -1 or 1
+    for node in small_world_network.nodes:
+        node.value = random.uniform(-1, 1)
     
+    # Iterating an update 100 times
+    for frame in range(len(steps)):
+        # Iterating single steps 1000 times to form an update
+        for step in range(1000):
+            #calling step function
+            ising_network_step(network, external, alpha)
+        #plotting each one of the 100 frames
+        mean_opinions.append(mean_opinion(network))
+        network.plot()
+        plt.show()
+
+    # Plotting the mean opinions of the network over time
+    plt.plot(steps, mean_opinions)
+    plt.title('Mean opinions over time')
+    plt.xlabel('Steps')
+    plt.ylabel('Mean Opinion')
+    plt.show()
+
 #Main function for ising model - Task 1
 def ising_main(population, alpha=None, external=0.0):
     '''
-    This function forms the main plot
-    Inputs: population (numpy array)
-            alpha (float) - optional - the magnitude of the alpha value to be used in calculation
-            external (float) - optional - the magnitude of any external "pull" on opinion
+    This function forms the main plot of the ising model
+    Inputs: 
+        population (numpy array)
+        alpha (float) - optional - the magnitude of the alpha value to be used in calculation
+        external (float) - optional - the magnitude of any external "pull" on opinion
     '''
     #creating the plot
     fig = plt.figure()
@@ -501,69 +597,116 @@ def initial_opinions(no_opinions):
     return np.random.random(no_opinions)
 
 def compare(opinions, threshold, beta):
-    '''Compares the value of the randomly selected person and a random neighbour'''
+    '''
+    A function that compares the value of the randomly selected person and a random neighbour
+    Inputs:
+        opinions - initial opinions on a grid 
+        threshold - threshold under which opinions will change
+        beta - multiplier for opinion change
+    Outputs:
+        opinions - updated opinions on a grid
+    '''
     for i in range(len(opinions)):
-        person_index = random.randint(0, len(opinions)-1)  # Random index for a 'person'.
+        # Random index for a 'person'.
+        person_index = random.randint(0, len(opinions)-1)  
         # Fixes the edge cases
         if person_index == 0:
-            neighbours_index = 1  # Only chooses neighbor to the right.
+             # Only chooses neighbor to the right.
+            neighbours_index = 1 
         elif person_index == len(opinions) - 1:
-            neighbours_index = person_index - 1  # Only chooses neighbor to the left.
+            # Only chooses neighbor to the left.
+            neighbours_index = person_index - 1  
         else:
-            neighbours_index = random.choice([person_index + 1, person_index - 1])  # Randomly chooses a neighbor from either side of the 'person'.
+            # Randomly chooses a neighbor from either side of the 'person'.
+            neighbours_index = random.choice([person_index + 1, person_index - 1])  
 
         difference = opinions[neighbours_index] - opinions[person_index] 
 
-        if abs(difference) < threshold: # The question asks for the modulus of the different, so abs function employed.
+        # The question asks for the modulus of the different, so abs function employed.
+        if abs(difference) < threshold: 
             opinions[person_index] += beta * difference
             opinions[neighbours_index] -= beta * difference 
 
     return opinions
 
 def interact(no_opinions, threshold, beta, repetitions):
-    '''Compares all of the 'people' and 'neighbours' for a variable amount of iterations'''
+    '''
+    Compares all of the 'people' and 'neighbours' for a variable amount of iterations
+    Inputs:
+        no_opinions - number of opinions to analyse
+        threshold - threshold under which opinions will change
+        beta - multiplier for opinion change
+        repetitions - number of repetitions to run the code for
+    Outputs:
+        opinions_grid - final opinions on the grid
+        stored_opinions - all opinions held on the grid over time
+    '''
     opinions_grid = initial_opinions(no_opinions)
-    stored_opinions = [opinions_grid.copy()]  # Stores a copy of the initial state
+    # Store a copy of the initial state
+    stored_opinions = [opinions_grid.copy()]  
 
     for _ in range(repetitions):
         opinions_grid = compare(opinions_grid, threshold, beta) 
-        stored_opinions.append(opinions_grid.copy())  # Append a copy after each interaction to create the list to be used in the scatter graph.
+        # Append a copy after each interaction to create the list to be used in the scatter graph.
+        stored_opinions.append(opinions_grid.copy()) 
 
     return opinions_grid, stored_opinions
 
 def y_values(stored_opinions):
-    '''Extracts the y-values (opinions) and corresponding x-values (time steps) from a list of opinions stored over multiple time steps'''
+    '''
+    Extracts the y-values (opinions) and corresponding x-values (time steps) from a list of opinions stored over multiple time steps
+    Inputs:
+        stored_opinions - all opinions held on a grid over time
+    Outputs:
+        x_list - timesteps to be plotted on the x-axis
+        y_list - opinions to be plotted on the y-axis
+    '''
     y_list = []
     x_list = []
     for index, opinions in enumerate(stored_opinions): # Enumerate gives us both the index of each opinion and the opinion itself.
-        x_list.extend([index] * len(opinions)) # Creates the timesteps.
-        y_list.extend(opinions)  # Adds all the opinions from the current time step to the y_list for the scatter graph.
+        # Creates the timesteps.
+        x_list.extend([index] * len(opinions)) 
+        # Adds all the opinions from the current time step to the y_list for the scatter graph.
+        y_list.extend(opinions) 
     return y_list, x_list
 
 def plot_scatter(ax, stored_opinions):
-    ''' Plots a scatter graph of stored opinions against time steps'''
+    ''' 
+    Plots a scatter graph of stored opinions against time steps
+    '''
     y_list, x_list = y_values(stored_opinions)
     ax.scatter(x_list, y_list, color='red')
     ax.set_ylim(0, 1)
     ax.set_ylabel('Opinions')
 
 def plot_hist(ax, opinions_list):
-    ''' Plots a histogram of the opinions from one timestep'''
+    ''' 
+    Plots a histogram of the opinions from one timestep
+    '''
     ax.hist(opinions_list)
     ax.set_xlim([0, 1])
     ax.set_xlabel('Opinions')
 
 def test_initial_opinion():
+    '''
+    Tests initial opinions in the defuant model
+    '''
     assert len(initial_opinions(10)) == 10
     assert all(0 <= x <= 1 for x in initial_opinions(10))
 
 def test_compare():
+    '''
+    Tests the compare function of the defuant model
+    '''
     opinions = [0.5, 0.5, 0.5]
     threshold = 0.1
     beta = 0.2
     assert compare(opinions, threshold, beta) == [0.5, 0.5, 0.5]
 
 def test_interact():
+    '''
+    Tests the interact function of the defuant model
+    '''
     no_opinions = 10
     threshold = 0.1
     beta = 0.2
@@ -573,12 +716,18 @@ def test_interact():
     assert len(stored_opinions[0]) == no_opinions
  
 def test_y_values():
+    '''
+    Tests the y_values function of the defuant model
+    '''
     stored_opinions = [[0.1, 0.2, 0.3], [0.2, 0.3, 0.4]]
     y_list, x_list = y_values(stored_opinions)
     assert y_list == [0.1, 0.2, 0.3, 0.2, 0.3, 0.4]
     assert x_list == [0, 0, 0, 1, 1, 1]
 
 def test_all_functions():
+    '''
+    Tests all functions for the defuant model
+    '''
     test_initial_opinion()
     print('Initial opinion test passed')
     test_compare()
@@ -609,47 +758,67 @@ def defuant_main(no_opinions, threshold, beta, repetitions):
     plt.show()
 
 def network_main(network_size, connection_probability):
+    '''
+    Function that runs the network model
+    Inputs:
+        network_size - Size of network to be created
+        connection_probability - Probability of two nodes connecting
+    Outputs:
+        Calculates and displays the mean degree, mean path length and mean clustering coefficient of the network.
+        Plots a graph of the network.
+    '''
     # Creating a random network
     network = Network()
-    network.make_random_network(int(network_size[0]), connection_probability)
+    network.make_random_network(network_size, connection_probability)
 
     # Finding mean degree, mean path length and mean clustering coefficient
     print('Mean Degree:', network.get_mean_degree())
     print('Average Path Length:', network.get_path_length())
     print('Clustering co-efficient:', network.get_mean_clustering())
+    network.plot()
+    plt.show()
 
 def small_world_main(small_world_size, re_wire_prob):
+    '''
+    Function that runs the small world network model and plots a graph of this
+    '''
     small_world = Network()
     small_world.make_small_world_network(small_world_size, re_wire_prob)
     small_world.plot()
+    plt.show()
 
 def ring_main(ring_size):
+    '''
+    Function that runs the ring network model and plots a graph of this
+    '''
     ring = Network()
     ring.make_ring_network(ring_size)
     ring.plot()
+    plt.show()
 
 def main():
+    # Creating argument parser
     parser = argparse.ArgumentParser()
     
     #adding parse flags
-    parser.add_argument("-ising_model", action='store_true', help='Run the ising model with default values')
-    parser.add_argument("-external", type=float, default=0, help='Take a value to use for the external pull')
-    parser.add_argument("-alpha", type=float, default=1, help='Take a value to use for alpha')
-    parser.add_argument("-test_ising", action='store_true', help='Check whether to run the tests')
-    parser.add_argument("-defuant", action='store_true', help='Run the defuant model')
-    parser.add_argument('-beta', type=float, default=0.2, help='Multiplier for opinion change in defuant')
-    parser.add_argument("-threshold", type=float, default=0.2, help='Opinion change threshold in defuant')
-    parser.add_argument("-use_network", nargs=1, default=10, help='Flag to use network in ising model')
-    parser.add_argument("-test_network", action="store_true", help='Run network tests')
-    parser.add_argument("-network", nargs=1, help='Determine how many nodes there will be in a random network')
-    parser.add_argument("-connection_probability", nargs=1, default=0.5, help='Assign connection probability in a random network')
-    parser.add_argument("-no_opinions", nargs=1, default=100, help='Number of opinions to analyse in defuant')
-    parser.add_argument("-repetitions", nargs=1, default=100, help='Number of repetitions for defuant')
-    parser.add_argument("-ring_network", type=int, default=1, help='Generate a ring network of specified size with default range 1')
-    parser.add_argument("-small_world", type=int, help='Generate a small-world network of specified size with defualt parameters')
-    parser.add_argument('-re_wire', type=float, default=0.1, help='Set the re-wiring probability for small-world network (default:0.1)')
+    parser.add_argument("-ising_model", action='store_true', help='runs the ising model with default values') 
+    parser.add_argument("-external", type=float, default=0, help='takes a value to use for the external pull in ising model') 
+    parser.add_argument("-alpha", type=float, default=1, help='takes a value to use for alpha in ising model')
+    parser.add_argument("-test_ising", action='store_true', help='checks whether to run tests for the ising model')
+    parser.add_argument("-defuant", action='store_true', help='runs the defuant model')
+    parser.add_argument('-beta', type=float, default=0.2, help='multiplier for opinion change in the defuant model') 
+    parser.add_argument("-threshold", type=float, default=0.2, help='opinion change threshold in the defuant model')
+    parser.add_argument("-use_network", type=int, help='flag to use a network in the ising model')
+    parser.add_argument("-test_network", action="store_true", help='runs network tests')
+    parser.add_argument("-network", type=int, help='determines how many nodes there will be in a random network')
+    parser.add_argument("-connection_probability", type=float, default=0.5, help='assigns connection probability in a random network')
+    parser.add_argument("-no_opinions", type=int, default=100, help='number of opinions to analyse in the defuant model')
+    parser.add_argument("-repetitions", type=int, default=100, help='number of repetitions for the defuant model')
+    parser.add_argument("-ring_network", type=int, help='Generates a ring network of specified size')
+    parser.add_argument("-small_world", type=int, help='Generates a small-world network of specified size with defualt parameters')
+    parser.add_argument('-re_wire', type=float, default=0.1, help='Sets the re-wiring probability for a small-world network (default:0.1)')
     
-    #Defining the variables
+    #Defining variables from arguments
     args = parser.parse_args()
     external = args.external
     alpha = args.alpha
@@ -661,39 +830,40 @@ def main():
     ring_size = args.ring_network
     small_world_size = args.small_world
     re_wire_prob = args.re_wire
+    ising_network_size = args.use_network
 
 
-    #checks for '-ising_model' flag and creates a population and runs main code if present
     if args.ising_model:
+        # if both '-ising_model' and '-use_network' flags are present, will run the ising model on a network
         if args.use_network:
-            network = Network()
-            ising_network(network, alpha, external)
+            ising_network(ising_network_size, alpha, external)
+        # if only 'ising_model' flag is present, runs the ising model on a 100 by 100 grid
         else:
             pop = np.random.choice([-1,1],size=(100,100))
             ising_main(pop, alpha, external)
     
-    #checks for '-test_ising' flag and runs ising test fucntion if present
+    #checks for '-test_ising' flag and runs ising test function if present
     if args.test_ising:
         test_ising()
 
-    # checks for '-defuant' flag and runs the defuant model
+    # checks for '-defuant' flag and runs the defuant model if present
     if args.defuant:
         defuant_main(no_opinions, threshold, beta, repetitions)
 
-    # Checks for '-network' flag and generates a random network
+    # Checks for '-network' flag and generates a random network if present
     if args.network:
         network_main(args.network, connection_probability)
 
-    # Tests network functions if network flag given
+    # Tests network functions if '-test_network' flag given
     if args.test_network:
         network = Network()
         network.test_networks()
 
-    # Check for ring network flag and creates a ring network
+    # Check for '-ring_network' flag and creates a ring network if present
     if args.ring_network:
         ring_main(ring_size)
 
-    # Checks for small world flag and creates a small world network
+    # Checks for '-small_world' flag and creates a small world network if present
     if args.small_world:
         small_world_main(small_world_size, re_wire_prob)
 
