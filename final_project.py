@@ -230,7 +230,6 @@ class Network:
                     node.connections[new_neighbour_index] = 1
                     self.nodes[new_neighbour_index].connections[node.index] = 1
 
-
     def plot(self):
         fig = plt.figure()
         ax = fig.add_subplot(111)
