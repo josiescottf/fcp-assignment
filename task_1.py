@@ -39,7 +39,10 @@ def get_neighbour_opinions(population, i, j):
 
 def calculate_agreement(population, row, col, external=0.0):
     '''
-    This function should return the *change* in agreement that would result if the cell at (row, col) was to flip it's value
+    This function should return the *change* in agreement of the cell at (row, col)
+    This is done by running through a list of the selected cell's neighbours and adding the (neighbour's * cell's) opinions to
+    the agreement value. Also, if there is an external value present this is multiplied by the cell's opinion and added
+    to the agreement value.
     Inputs: population (numpy array)
             row (int)
             col (int)
@@ -64,6 +67,9 @@ def calculate_agreement(population, row, col, external=0.0):
 def ising_step(population, external=0.0, alpha=1):
     '''
     This function will perform a single update of the Ising model
+    A random cell is chosen for it's change in agreement to be calculated. If it is negative then
+    the cell is negated. If it is positive then there is still a chance that is run using alpha
+    to negate the cell anyway.
     Inputs: population (numpy array)
             external (float) - optional - the magnitude of any external "pull" on opinion
             alpha (float) - optional - the magnitude of the alpha value to be used in calculation
@@ -140,7 +146,8 @@ def test_ising():
 #Main function for ising model - Task 1
 def ising_main(population, alpha=None, external=0.0):
     '''
-    This function forms the main plot
+    This function forms the main plot.
+    Each frame shown has updated the plot 1000 times. 100 frames are shown
     Inputs: population (numpy array)
             alpha (float) - optional - the magnitude of the alpha value to be used in calculation
             external (float) - optional - the magnitude of any external "pull" on opinion
