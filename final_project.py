@@ -766,7 +766,7 @@ def network_main(network_size, connection_probability):
     '''
     # Creating a random network
     network = Network()
-    network.make_random_network(int(network_size[0]), connection_probability)
+    network.make_random_network(network_size, connection_probability)
 
     # Finding mean degree, mean path length and mean clustering coefficient
     print('Mean Degree:', network.get_mean_degree())
@@ -807,10 +807,10 @@ def main():
     parser.add_argument("-threshold", type=float, default=0.2, help='opinion change threshold in the defuant model')
     parser.add_argument("-use_network", type=int, help='flag to use a network in the ising model')
     parser.add_argument("-test_network", action="store_true", help='runs network tests')
-    parser.add_argument("-network", nargs=1, help='determines how many nodes there will be in a random network')
-    parser.add_argument("-connection_probability", nargs=1, default=0.5, help='assigns connection probability in a random network')
-    parser.add_argument("-no_opinions", nargs=1, default=100, help='number of opinions to analyse in the defuant model')
-    parser.add_argument("-repetitions", nargs=1, default=100, help='number of repetitions for the defuant model')
+    parser.add_argument("-network", type=int, help='determines how many nodes there will be in a random network')
+    parser.add_argument("-connection_probability", type=float, default=0.5, help='assigns connection probability in a random network')
+    parser.add_argument("-no_opinions", type=int, default=100, help='number of opinions to analyse in the defuant model')
+    parser.add_argument("-repetitions", type=int, default=100, help='number of repetitions for the defuant model')
     parser.add_argument("-ring_network", type=int, help='Generates a ring network of specified size')
     parser.add_argument("-small_world", type=int, help='Generates a small-world network of specified size with defualt parameters')
     parser.add_argument('-re_wire', type=float, default=0.1, help='Sets the re-wiring probability for a small-world network (default:0.1)')
